@@ -1,0 +1,21 @@
+{   
+    "manifest_version": 2,
+
+    "name": "TextToSpeech",
+    "version": "1.0", 
+    
+    "description": "This chrome plugin will convert the text on a webpage to speech" ,
+
+    "background": {
+        "scripts": ["speech.js"],       
+        "persistent": false
+    },
+    
+    "permissions": [
+        "http://*/*", 
+        "https://*/*",
+        "contextMenus", 
+        "tts"
+    ]
+
+}
