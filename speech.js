@@ -5,10 +5,10 @@
             'rate': 1.0, 
             'voiceName': ''
         }; 
+        let speed = ["0.25", "0.50", "0.75", "1.0", "1.5", "2.0"];
         window.onload = function(){
         createMenu(); 
         chrome.contextMenus.onClicked.addListener(function(data) {
-            console.log(data);
             if(data.menuItemId == "start-speak" && data.selectionText){
                 chrome.tts.speak(data.selectionText, options);
             } 
@@ -21,15 +21,18 @@
             if(data.menuItemId == "resume-speak") {
                 chrome.tts.resume(); 
             }
-            if(data.parentId == "voice-select") {
-                options.voiceName = (data.menuItemId); 
+            if(data.parentMenuItemId == "voice-select") {
+                options.voiceName = data.menuItemId; 
+            }
+            if(data.parentMenuItemId == "speed-select") {
+                options.rate = parseFloat(data.menuItemId); 
             }
         });  
     }
     function createMenu() {
         chrome.contextMenus.create({
             title: "Text To Speak",
-            contexts:["selection"],
+            contexts:["all"],
             id: "text-to-speak",
         });
         chrome.contextMenus.create({
@@ -58,29 +61,48 @@
         });
         chrome.contextMenus.create({
             title: "Settings",
-            contexts:["selection"],
+            contexts:["all"],
             parentId: "text-to-speak",
             id: "setting-speak",
         });
         chrome.contextMenus.create({
             title: "Voice",
-            contexts:["selection"],
-            parentId: "text-to-speak",
+            contexts:["all"],
+            parentId: "setting-speak",
             id: "voice-select",
         });
         createVoiceMenu(); 
+        chrome.contextMenus.create({
+            title: "Speed",
+            contexts:["all"],
+            parentId: "setting-speak",
+            id: "speed-select",
+        });
+        createSpeedMenu(); 
     }
          
     function createVoiceMenu() {
-        chrome.tts.getVoices(function(voices) {            
+        chrome.tts.getVoices(function(voices) {        
+            console.log(voices);    
             for(let i = 0; i < voices.length; i++) {
                 chrome.contextMenus.create({
                     title: voices[i].voiceName,
-                    contexts:["selection"],
+                    contexts:["all"],
                     parentId: "voice-select",
                     id: voices[i].voiceName,
                 });
             }
         });
+    }
+
+    function createSpeedMenu() {
+        for(let i = 0; i < speed.length; i++) {
+            chrome.contextMenus.create({
+                title: speed[i],
+                contexts:["all"],
+                parentId: "speed-select",
+                id: speed[i],
+            });
+        }
     }
 })();
